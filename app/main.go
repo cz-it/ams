@@ -27,7 +27,7 @@ func main() {
 		daemon.Boot("/tmp/magline.lock", "/tmp/magline.pid", func() {
 		})
 	} else {
-
+		_main()
 	}
 
 	println("[Testing]:End")
