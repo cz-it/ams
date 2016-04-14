@@ -1,7 +1,7 @@
 TARGET := ams 
 
-SRC_FILES := $(shell ls ../*.go )
-SRC_FILES += main.go flag.go config_xml.go
+SRC_FILES := $(shell ls ../*.go ../*/*.go )
+SRC_FILES += main.go flag.go config_xml.go 
 
 .DEFAULT:all
 

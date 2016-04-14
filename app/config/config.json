@@ -1,5 +1,10 @@
 {
-	"OuterAddr":"tcp://127.0.0.1:8082",
-	"InnerAddr":"unix:///tmp/maglined",
-    "MaxConns" :1024
+	"ListenAddr":"tcp://127.0.0.1:8082",
+    "DBAddr" : "mysql.freehostia.com:3306",
+    "DBName" : "thesha3_db_ams",
+    "DBUser" : "thesha3_db_ams",
+    "DBPasswd" : "225306ams",
+    "Plugins" : [
+        "guest"
+    ]
 }

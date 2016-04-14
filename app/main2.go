@@ -41,15 +41,18 @@ func _main() {
 		fmt.Printf("prepare with error %s \n", err.Error())
 		return
 	}
-	res, err := stmt.Exec(22, "2014-04-03 12:23:23")
-	if err != nil {
-		fmt.Printf("exec with error %s \n", err.Error())
-		return
-	}
-	id, err := res.LastInsertId()
-	if err != nil {
-		fmt.Printf("Last inser id with error %s \n", err.Error())
-		return
-	}
-	fmt.Printf(" id is %d", id)
+	/*
+		res, err := stmt.Exec(22, "2014-04-03 12:23:23")
+		if err != nil {
+			fmt.Printf("exec with error %s \n", err.Error())
+			return
+		}
+		id, err := res.LastInsertId()
+		if err != nil {
+			fmt.Printf("Last inser id with error %s \n", err.Error())
+			return
+		}
+	*/
+	fmt.Println(sql.Drivers())
+	fmt.Println("stmt:", stmt)
 }
