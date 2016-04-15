@@ -2,12 +2,12 @@
 * Author: CZ cz.theng@gmail.com
  */
 
-package main
+package dbagent
 
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
+	//"github.com/go-sql-driver/mysql"
 )
 
 func _main() {
