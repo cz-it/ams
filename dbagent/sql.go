@@ -52,7 +52,7 @@ func createTables(db *sql.DB) (err error) {
 			f_app_id char(128) ,
 			f_open_id char(128) NOT NULL,
 			f_user_id bigint unsigned NOT NULL,
-			f_master_user_id bigint unsigned NOT NULL,
+			f_master_user_id bigint unsigned ,
 			PRIMARY KEY (f_platform, f_app_id, f_open_id),
 			INDEX USING BTREE (f_platform, f_app_id, f_open_id)
 		) ENGINE = InnoDB; `)
@@ -93,28 +93,60 @@ func insert(db *sql.DB, table string, colval ...interface{}) (err error) {
 	return
 }
 
-func query(db *sql.DB, table string, col string, colval ...interface{}) (value interface{}, err error) {
-
+func query(db *sql.DB, table string, col string, cond ...interface{}) (value interface{}, err error) {
+	var sql string
+	sql = fmt.Sprintf("SELECT %s FROM %s ", col, table)
+	if nil == cond || len(cond) == 0 {
+		err = db.QueryRow(sql).Scan(value)
+		return
+	}
+	sql += " WHERE "
+	c := ""
+	ctag := ""
+	for i, v := range cond {
+		if i >= len(cond)/2 {
+			break
+		}
+		c += ctag + v.(string) + "=?"
+		ctag = " AND "
+	}
+	sql += c
+	var v interface{}
+	err = db.QueryRow(sql, cond[len(cond)/2:]...).Scan(&v)
+	value = uint64(v.(int64))
 	return
 }
 
-/*
-	stmt, err := db.Prepare(`INSERT t_ams_use_id ( f_user_id, f_create_time) values (?,?)`)
+func update(db *sql.DB, table string, col string, value interface{}, cond ...interface{}) (err error) {
+	var sql string
+	sql = fmt.Sprintf("UPDATE %s  SET %s=? ", table, col)
+	if cond == nil || len(cond) == 0 {
+		stmt, err := db.Prepare(sql)
+		if err != nil {
+			utils.Logger.Error("prepare with error %s \n", err.Error())
+			return err
+		}
+		_, err = stmt.Exec()
+		return err
+	}
+	sql += " WHERE "
+	c := ""
+	ctag := ""
+	for i, v := range cond {
+		if i >= len(cond)/2 {
+			break
+		}
+		c += ctag + v.(string) + "=?"
+		ctag = " AND "
+	}
+	sql += c
+	stmt, err := db.Prepare(sql)
 	if err != nil {
-		fmt.Printf("prepare with error %s \n", err.Error())
+		utils.Logger.Error("prepare with error %s \n", err.Error())
 		return
 	}
-		res, err := stmt.Exec(22, "2014-04-03 12:23:23")
-		if err != nil {
-			fmt.Printf("exec with error %s \n", err.Error())
-			return
-		}
-		id, err := res.LastInsertId()
-		if err != nil {
-			fmt.Printf("Last inser id with error %s \n", err.Error())
-			return
-		}
-	fmt.Println(sql.Drivers())
-	fmt.Println("stmt:", stmt)
+	execarg := []interface{}{value}
+	execarg = append(execarg, cond[len(cond)/2:]...)
+	_, err = stmt.Exec(execarg...)
+	return
 }
-*/

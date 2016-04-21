@@ -6,6 +6,7 @@ package dbagent
 
 import (
 	"database/sql"
+	"github.com/cz-it/ams/utils"
 	"time"
 )
 
@@ -28,17 +29,17 @@ func InsertUID(UID uint64) error {
 }
 
 //QueryUID query a user's UID
-func QueryUID(platform int, appID string, openID string) (UID string, err error) {
+func QueryUID(platform int, appID string, openID string) (UID uint64, err error) {
 	return agent.queryUID(platform, appID, openID)
 }
 
 //InsertPlatformUID insert a usre's UID to db
-func InsertPlatformUID(platform int, appID string, openID string, UID string) error {
+func InsertPlatformUID(platform int, appID string, openID string, UID uint64) error {
 	return agent.insertPlatformUID(platform, appID, openID, UID)
 }
 
 //BindUID bind a platform UID to master UID
-func BindUID(platform int, appID string, openID string, UID string) error {
+func BindUID(platform int, appID string, openID string, UID uint64) error {
 	return agent.bindUID(platform, appID, openID, UID)
 }
 
@@ -60,14 +61,24 @@ func (ag *DBAgent) insertUID(UID uint64) error {
 	return err
 }
 
-func (ag *DBAgent) queryUID(platform int, appID string, openID string) (UID string, err error) {
+func (ag *DBAgent) queryUID(platform int, appID string, openID string) (UID uint64, err error) {
+	rst, err := query(ag.db, "t_ams_open_id", "f_master_user_id", "f_platform", "f_app_id", "f_open_id", platform, appID, openID)
+	if err != nil {
+		return
+	}
+	if rst != nil {
+		utils.Logger.Error("rst is null")
+		UID = rst.(uint64)
+	}
 	return
 }
 
-func (ag *DBAgent) insertPlatformUID(platform int, appID string, openID string, UID string) error {
-	return nil
+func (ag *DBAgent) insertPlatformUID(platform int, appID string, openID string, UID uint64) error {
+	err := insert(ag.db, "t_ams_open_id", "f_platform", "f_app_id", "f_open_id", "f_user_id", platform, appID, openID, UID)
+	return err
 }
 
-func (ag *DBAgent) bindUID(platform int, appID string, openID string, UID string) error {
-	return nil
+func (ag *DBAgent) bindUID(platform int, appID string, openID string, UID uint64) error {
+	err := update(ag.db, "t_ams_open_id", "f_master_user_id", UID, "f_platform", "f_app_id", "f_open_id", platform, appID, openID)
+	return err
 }
